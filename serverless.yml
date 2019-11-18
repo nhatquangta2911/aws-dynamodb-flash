@@ -1,0 +1,131 @@
+service: ai-model
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  profile: shawn2911
+  # environment:
+  #   tableName: ${self:custom.settings.NODES_TABLE}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        "*"
+        # - "arn:aws:dynamodb:us-east-1:*:table/${self:custom.settings.NODES_TABLE}"
+
+plugins:
+  - serverless-s3-sync
+
+custom:
+  settings:
+    NODES_TABLE: nodes
+    ACTIVATION_FUNCTIONS_TABLE: activationFunctions
+  tableName: neural-network
+  s3Sync:
+    - bucketName: myveryfirstprojectuploadbucketwithserverless-29111997
+      localDir: upload
+
+functions:
+  # ACTIVATION FUNCTIONS
+  getAllActivationFunctions:
+    handler: endpoints/activationFunction/getAllActivationFunctions.handler
+    events:
+      - http:
+          path: api/activationFunctions
+          method: GET
+          cors: true
+  getActivationFunction:
+    handler: endpoints/activationFunction/getActivationFunction.handler
+    events:
+      - http:
+          path: api/activationFunctions/{id}
+          method: GET
+          cors: true
+  addActivationFunction:
+    handler: endpoints/activationFunction/addActivationFunction.handler
+    events:
+      - http:
+          path: api/activationFunctions
+          method: POST
+          cors: true
+  updateActivationFunction:
+    handler: endpoints/activationFunction/updateActivationFunction.handler
+    events:
+      - http:
+          path: api/activationFunctions/{id}
+          method: PUT
+          cors: true
+  deleteActivationFunction:
+    handler: endpoints/activationFunction/deleteActivationFunction.handler
+    events:
+      - http:
+          path: api/activationFunctions/{id}
+          method: DELETE
+          cors: true
+          authorizer: aws_iam
+  # NODES
+  getNode:
+    handler: endpoints/node/getNode.handler
+    events:
+      - http:
+          path: api/nodes/{id}
+          method: GET
+          cors: true
+  getAllNode:
+    handler: endpoints/node/getAllNodes.handler
+    events:
+      - http:
+          path: api/nodes
+          method: GET
+          cors: true
+  addNode:
+    handler: endpoints/node/addNode.handler
+    events:
+      - http:
+          path: api/nodes
+          method: POST
+          cors: true
+  updateNode:
+    handler: endpoints/node/updateNode.handler
+    events:
+      - http:
+          path: api/nodes/{id}
+          method: PUT
+          cors: true
+  deleteNode:
+    handler: endpoints/node/deleteNode.handler
+    events:
+      - http:
+          path: api/nodes/{id}
+          method: DELETE
+          cors: true
+
+resources:
+  Resources:
+    DemoBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: myveryfirstprojectuploadbucketwithserverless-291119972
+    NodesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.NODES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    ActivationFunctionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.ACTIVATION_FUNCTIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
