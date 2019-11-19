@@ -33,6 +33,28 @@ const Dynamo = {
 
     return data.Item;
   },
+  async getNodes(layerId, TableName) {
+    const params = {
+      TableName,
+      FilterExpression: "#x = :a",
+      ExpressionAttributeNames: {
+        "#x": "layerId"
+      },
+      ExpressionAttributeValues: {
+        ":a": layerId
+      }
+    };
+    const data = await documentClient.scan(params).promise();
+    if (!data || !data.Items) {
+      throw Error(
+        `There was an error fetching the data for id of ${id} from ${TableName}`
+      );
+    } else {
+      console.log(data.Items);
+      let ids = data && data.Items && data.Items.map(i => i.nodeId);
+      return ids;
+    }
+  },
   async post(item, TableName) {
     const params = {
       Item: item,
@@ -89,6 +111,32 @@ const Dynamo = {
         ":x": item.weight,
         ":y": item.bias,
         ":z": item.description
+      },
+      ReturnValues: "ALL_NEW"
+    };
+    const result = await documentClient.update(params).promise();
+    if (!result) {
+      throw Error(
+        `There was an error fetching the data for id of ${id} from ${TableName}`
+      );
+    }
+    console.log(result);
+    return result;
+  },
+  async putLayer(id, item, TableName) {
+    const params = {
+      TableName,
+      Key: {
+        _id: id
+      },
+      UpdateExpression: `set #a = :x, #b = :y`,
+      ExpressionAttributeNames: {
+        "#a": "name",
+        "#b": "type"
+      },
+      ExpressionAttributeValues: {
+        ":x": item.name,
+        ":y": item.type
       },
       ReturnValues: "ALL_NEW"
     };

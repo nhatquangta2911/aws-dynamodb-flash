@@ -21,7 +21,9 @@ custom:
   settings:
     NODES_TABLE: nodes
     ACTIVATION_FUNCTIONS_TABLE: activationFunctions
-  tableName: neural-network
+    LAYER_TABLE: layers
+    LAYER_NODES_TABLE: layer_nodes
+    LAYER_TRANSACTION: layer_transactions
   s3Sync:
     - bucketName: myveryfirstprojectuploadbucketwithserverless-29111997
       localDir: upload
@@ -72,7 +74,7 @@ functions:
           path: api/nodes/{id}
           method: GET
           cors: true
-  getAllNode:
+  getAllNodes:
     handler: endpoints/node/getAllNodes.handler
     events:
       - http:
@@ -100,6 +102,72 @@ functions:
           path: api/nodes/{id}
           method: DELETE
           cors: true
+  # LAYERS
+  getLayer:
+    handler: endpoints/layer/getLayer.handler
+    events:
+      - http:
+          path: api/layers/{id}
+          method: GET
+          cors: true
+  getAllLayers:
+    handler: endpoints/layer/getAllLayers.handler
+    events:
+      - http:
+          path: api/layers
+          method: GET
+          cors: true
+  addLayer:
+    handler: endpoints/layer/addLayer.handler
+    events:
+      - http:
+          path: api/layers
+          method: POST
+          cors: true
+  updateLayer:
+    handler: endpoints/layer/updateLayer.handler
+    events:
+      - http:
+          path: api/layers/{id}
+          method: PUT
+          cors: true
+  deleteLayer:
+    handler: endpoints/layer/deleteLayer.handler
+    events:
+      - http:
+          path: api/layers/{id}
+          method: DELETE
+          cors: true
+  # LAYER_NODES
+  pushNode:
+    handler: endpoints/layer/pushNode.handler
+    events:
+      - http:
+          path: api/layers/nodes
+          method: POST
+          cors: true
+  getNodes:
+    handler: endpoints/layer/getNodes.handler
+    events:
+      - http:
+          path: api/layers/nodes/{id}
+          method: GET
+          cors: true
+  # LAYER_TRANSACTIONS (LAYER_ACTIVATION_FUNCTIONS)
+  pushActivationFunction:
+    handler: endpoints/layer/pushActivationFunction.handler
+    events:
+      - http:
+          path: api/transactions
+          method: POST
+          cors: true
+  getTransactions:
+    handler: endpoints/layer/getTransactions.handler
+    events:
+      - http:
+          path: api/transactions
+          method: GET
+          cors: true
 
 resources:
   Resources:
@@ -122,6 +190,39 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.settings.ACTIVATION_FUNCTIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    LayersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.LAYER_TABLE}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    LayerNodesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.LAYER_NODES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    LayerTransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.LAYER_TRANSACTION}
         AttributeDefinitions:
           - AttributeName: "_id"
             AttributeType: "S"
