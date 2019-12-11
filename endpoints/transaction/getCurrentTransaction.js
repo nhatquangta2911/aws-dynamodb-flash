@@ -6,7 +6,7 @@ const tableName = "transactions";
 
 module.exports.handler = async event => {
   console.log("event", event);
-  const items = await Dynamo.getAll(tableName).catch(err => {
+  const items = await Dynamo.getLatest(tableName).catch(err => {
     console.log("error in Dynamo GET", err);
     return null;
   });

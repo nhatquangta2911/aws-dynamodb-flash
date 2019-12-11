@@ -61,6 +61,21 @@ const Dynamo = {
     const response = { result, total: data.Items.length };
     return response;
   },
+  async getLatest(TableName) {
+    const params = {
+      TableName
+    };
+    const data = await documentClient.scan(params).promise();
+    if (!data || !data.Items) {
+      throw Error(`There was an error fetching the data from ${TableName}`);
+    }
+    const orderedData = data.Items.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    const result = orderedData.slice(0, 1);
+    const response = { result, total: data.Items.length };
+    return response;
+  },
   async getNodes(layerId, TableName) {
     const params = {
       TableName,

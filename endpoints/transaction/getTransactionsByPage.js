@@ -27,7 +27,7 @@ module.exports.handler = async event => {
     total: items.total,
     totalPage:
       items.total % 10 === 0
-        ? Math.round(items.total / 10)
-        : Math.round(items.total / 10) + 1
+        ? Math.floor(items.total / 10)
+        : Math.floor(items.total / 10) + 1
   });
 };
