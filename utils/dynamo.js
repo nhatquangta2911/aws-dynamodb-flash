@@ -34,18 +34,31 @@ const Dynamo = {
 
     return data.Item;
   },
-  async getByPage(page, TableName) {
+  async getCurrent(TableName) {
     const params = {
       TableName,
-      Limit: 5
+      Limit: 1
     };
     const data = await documentClient.scan(params).promise();
-    if (!data || !data.Item) {
+    if (!data || !data.Items) {
       throw Error(`There was an error fetching the data from ${TableName}`);
     }
     console.log(data);
-
-    return data.Item;
+    return data.Items;
+  },
+  async getByPage(page, TableName) {
+    const params = {
+      TableName
+    };
+    const data = await documentClient.scan(params).promise();
+    if (!data || !data.Items) {
+      throw Error(`There was an error fetching the data from ${TableName}`);
+    }
+    const orderedData = data.Items.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    const result = orderedData.slice((page - 1) * 10, page * 10);
+    return result;
   },
   async getNodes(layerId, TableName) {
     const params = {

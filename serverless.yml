@@ -198,6 +198,13 @@ functions:
           path: api/v2/transactions/{page}
           method: GET
           cors: true
+  getV2CurrentTransaction:
+    handler: endpoints/transaction/getCurrentTransaction.handler
+    events:
+      - http:
+          path: api/v2/transactions/current
+          method: GET
+          cors: true
   addV2Transactions:
     handler: endpoints/transaction/addTransaction.handler
     events:

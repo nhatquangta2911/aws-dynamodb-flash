@@ -18,6 +18,8 @@ module.exports.handler = async event => {
     af2: body.af2,
     af3: body.af3,
     epochs: body.epochs,
+    accuracy: body.accuracy,
+    loss: body.loss,
     note: body.note || "NO CONTENT"
   };
   const result = await Dynamo.post(item, tableName).catch(err => {
