@@ -21,5 +21,12 @@ module.exports.handler = async event => {
       message: "Failed to get transactions by page."
     });
   }
-  return Responses._200({ nodes: items, total: items.length });
+  return Responses._200({
+    nodes: items.result,
+    size: items.result.length,
+    totalPage:
+      items.total % 10 === 0
+        ? Math.round(items.total / 10)
+        : Math.round(items.total / 10) + 1
+  });
 };

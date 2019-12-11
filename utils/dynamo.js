@@ -58,7 +58,8 @@ const Dynamo = {
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
     const result = orderedData.slice((page - 1) * 10, page * 10);
-    return result;
+    const response = { result, total: data.Items.length };
+    return response;
   },
   async getNodes(layerId, TableName) {
     const params = {
