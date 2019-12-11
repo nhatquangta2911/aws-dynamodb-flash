@@ -21,13 +21,27 @@ const Dynamo = {
       TableName,
       Key: {
         _id: id
-      }
+      },
+      ReturnConsumedCapacity: "TOTAL"
     };
     const data = await documentClient.get(params).promise();
     if (!data || !data.Item) {
       throw Error(
         `There was an error fetching the data for id of ${id} from ${TableName}`
       );
+    }
+    console.log(data);
+
+    return data.Item;
+  },
+  async getByPage(page, TableName) {
+    const params = {
+      TableName,
+      Limit: 5
+    };
+    const data = await documentClient.scan(params).promise();
+    if (!data || !data.Item) {
+      throw Error(`There was an error fetching the data from ${TableName}`);
     }
     console.log(data);
 
@@ -111,6 +125,34 @@ const Dynamo = {
         ":x": item.weight,
         ":y": item.bias,
         ":z": item.description
+      },
+      ReturnValues: "ALL_NEW"
+    };
+    const result = await documentClient.update(params).promise();
+    if (!result) {
+      throw Error(
+        `There was an error fetching the data for id of ${id} from ${TableName}`
+      );
+    }
+    console.log(result);
+    return result;
+  },
+  async putTransaction(id, item, TableName) {
+    const params = {
+      TableName,
+      Key: {
+        _id: id
+      },
+      UpdateExpression: `set #a = :x, #b = :y, #c = :z`,
+      ExpressionAttributeNames: {
+        "#a": "inputLayerId",
+        "#b": "outputLayerId",
+        "#c": "activationFunctionId"
+      },
+      ExpressionAttributeValues: {
+        ":x": item.inputLayerId,
+        ":y": item.outputLayerId,
+        ":z": item.activationFunctionId
       },
       ReturnValues: "ALL_NEW"
     };

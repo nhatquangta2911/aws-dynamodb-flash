@@ -24,6 +24,7 @@ custom:
     LAYER_TABLE: layers
     LAYER_NODES_TABLE: layer_nodes
     LAYER_TRANSACTION: layer_transactions
+    TRANSACTION_TABLE: transactions
   s3Sync:
     - bucketName: myveryfirstprojectuploadbucketwithserverless-29111997
       localDir: upload
@@ -65,7 +66,7 @@ functions:
           path: api/activationFunctions/{id}
           method: DELETE
           cors: true
-          authorizer: aws_iam
+          # authorizer: aws_iam
   # NODES
   getNode:
     handler: endpoints/node/getNode.handler
@@ -168,6 +169,42 @@ functions:
           path: api/transactions
           method: GET
           cors: true
+  deleteTransaction:
+    handler: endpoints/layer/deleteTransaction.handler
+    events:
+      - http:
+          path: api/transactions/{id}
+          method: DELETE
+          cors: true
+  updateTransaction:
+    handler: endpoints/layer/updateTransaction.handler
+    events:
+      - http:
+          path: api/transactions/{id}
+          method: PUT
+          cors: true
+  # TRANSACTIONS
+  getAllV2Transactions:
+    handler: endpoints/transaction/getTransactions.handler
+    events:
+      - http:
+          path: api/v2/transactions
+          method: GET
+          cors: true
+  getV2TransactionsByPage:
+    handler: endpoints/transaction/getTransactionsByPage.handler
+    events:
+      - http:
+          path: api/v2/transactions/{page}
+          method: GET
+          cors: true
+  addV2Transactions:
+    handler: endpoints/transaction/addTransaction.handler
+    events:
+      - http:
+          path: api/v2/transactions
+          method: POST
+          cors: true
 
 resources:
   Resources:
@@ -223,6 +260,17 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.settings.LAYER_TRANSACTION}
+        AttributeDefinitions:
+          - AttributeName: "_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "_id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    TransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.settings.TRANSACTION_TABLE}
         AttributeDefinitions:
           - AttributeName: "_id"
             AttributeType: "S"
