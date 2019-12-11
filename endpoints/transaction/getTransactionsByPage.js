@@ -24,6 +24,7 @@ module.exports.handler = async event => {
   return Responses._200({
     nodes: items.result,
     size: items.result.length,
+    total: items.total,
     totalPage:
       items.total % 10 === 0
         ? Math.round(items.total / 10)
